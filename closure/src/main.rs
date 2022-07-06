@@ -6,8 +6,7 @@ fn main() {
         T: Fn(u32) -> u32,
     {
         calculation: T,
-        value: Option<u32>,
-        map: HashMap<u32, u32>,
+        value: HashMap<u32, u32>,
     }
 
     impl<T> Cacher<T>
@@ -17,23 +16,17 @@ fn main() {
         fn new(calculation: T) -> Cacher<T> {
             Cacher {
                 calculation,
-                value: None,
-                map: HashMap::new(),
+                value: HashMap::new(),
             }
         }
 
         fn value(&mut self, arg: u32) -> u32 {
-            match self.value {
-                Some(v) => v,
+            match self.value.get(&arg) {
+                Some(&v) => v,
                 None => {
                     let v = (self.calculation)(arg);
-                    match self.map.get(&v) {
-                        Some(&v) => v,
-                        _ => {
-                            self.map.insert(arg, v);
-                            v
-                        }
-                    }
+                    self.value.insert(arg, v);
+                    v
                 }
             }
         }
